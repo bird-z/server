@@ -15,12 +15,14 @@ app.use(express.json())
 
 app.get('/', (request, response) => {
   response.send('<h1>its my version 0.1 i am link by mysql</h1>')
+  console.log('connect to /')
 })
 
 //app.get from mysql
 app.get('/api/news', async (request, response) => {
     const [rows] = await pool.query('SELECT * FROM news')
     response.json(rows)
+    console.log('connect to /api/news')
 })
 
 //app.get from mysql by id
@@ -32,6 +34,7 @@ app.get('/api/news/:id', async (request, response) => {
   } else {
     response.status(404).json({ error: 'news not found' })
   }
+  console.log('connect to /api/news:id')
 })
 
 const PORT = process.env.PORT||3001
