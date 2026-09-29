@@ -1,6 +1,11 @@
 'use strict'
 /* news-server console — vanilla JS, no build step */
 
+// API base derived from mount path: /console/ -> '', /news/console/ -> '/news'.
+// Lets the same static bundle work on localhost:3001/console and
+// bioqif.com/news/console behind a path-prefix reverse proxy.
+const API_BASE = location.pathname.replace(/\/console\/?.*$/, '')
+
 const $ = (sel) => document.querySelector(sel)
 const $$ = (sel) => [...document.querySelectorAll(sel)]
 
@@ -20,7 +25,7 @@ async function api(path, opts = {}) {
   const headers = { ...(opts.headers || {}) }
   if (opts.body) headers['Content-Type'] = 'application/json'
   if (path.startsWith('/api/admin')) headers.Authorization = `Bearer ${store.token}`
-  const res = await fetch(path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : undefined })
+  const res = await fetch(API_BASE + path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : undefined })
   if (res.status === 401) { toast('认证失败：请检查 ADMIN_TOKEN', true); throw new Error('unauthorized') }
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)

@@ -14,9 +14,9 @@ async function main() {
     console.error(`[db] ping failed: ${err.message} (server still starts; /api/health reports degraded)`)
   }
 
-  const server = app.listen(config.port, () => {
-    console.log(`[server] news-server listening on http://localhost:${config.port}`)
-    console.log(`[server] console: http://localhost:${config.port}/console/`)
+  const server = app.listen(config.port, config.host, () => {
+    console.log(`[server] news-server listening on http://${config.host}:${config.port}`)
+    console.log(`[server] console: http://${config.host}:${config.port}/console/`)
     if (config.adminTokenEphemeral) {
       console.log('[auth] ADMIN_TOKEN not set; ephemeral token for this boot:')
       console.log(`[auth]   ${config.adminToken}`)

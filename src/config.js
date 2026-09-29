@@ -19,6 +19,9 @@ const config = {
     connectionLimit: num(process.env.DB_POOL_SIZE, 10),
   },
 
+  // bind host: production should be 127.0.0.1 behind nginx
+  host: process.env.HOST || '0.0.0.0',
+
   corsOrigins: (process.env.CORS_ORIGINS || '*')
     .split(',')
     .map((s) => s.trim())
@@ -29,6 +32,8 @@ const config = {
   adminTokenEphemeral: !process.env.ADMIN_TOKEN,
 
   spider: {
+    // false in prod: scrapy stack stays dev-only, spider endpoints return 503
+    enabled: process.env.SPIDER_ENABLED !== 'false',
     dir: path.resolve(__dirname, '..', process.env.SCRAPY_DIR || '../news'),
     cooldownMs: num(process.env.SPIDER_COOLDOWN_MS, 10_000),
     logDir: path.resolve(__dirname, '..', 'logs'),
