@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>news-server · 控制台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">◈</span> news-server
+    <span class="tag">console</span>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">仪表盘</button>
+    <button class="tab" data-tab="news">新闻数据</button>
+    <button class="tab" data-tab="spider">爬虫任务</button>
+  </nav>
+  <div class="auth">
+    <input id="tokenInput" type="password" placeholder="ADMIN_TOKEN" autocomplete="off">
+    <button id="tokenSave" class="btn">保存</button>
+    <span id="healthDot" class="dot" title="health"></span>
+  </div>
+</header>
+
+<main>
+  <!-- ============ Dashboard ============ -->
+  <section id="tab-dashboard" class="panel active">
+    <div class="cards" id="statCards">
+      <div class="card"><div class="card-label">总条数</div><div class="card-value" id="statTotal">—</div></div>
+      <div class="card"><div class="card-label">总热度</div><div class="card-value" id="statSum">—</div></div>
+      <div class="card"><div class="card-label">平均热度</div><div class="card-value" id="statAvg">—</div></div>
+      <div class="card"><div class="card-label">最高热度</div><div class="card-value" id="statMax">—</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="box">
+        <h3>热度 Top 10</h3>
+        <div id="topChart" class="bars"></div>
+      </div>
+      <div class="box">
+        <h3>最近爬虫任务</h3>
+        <table class="tbl" id="recentJobsTbl">
+          <thead><tr><th>ID</th><th>状态</th><th>开始</th><th>条数</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ News ============ -->
+  <section id="tab-news" class="panel">
+    <div class="toolbar">
+      <input id="newsQ" type="search" placeholder="搜索标题 / URL…">
+      <select id="newsSort">
+        <option value="id:desc">最新</option>
+        <option value="id:asc">最早</option>
+        <option value="flow:desc">热度降序</option>
+        <option value="flow:asc">热度升序</option>
+      </select>
+      <button id="newsSearch" class="btn">查询</button>
+      <span id="newsTotal" class="muted"></span>
+    </div>
+    <table class="tbl" id="newsTbl">
+      <thead><tr><th style="width:60px">ID</th><th>标题</th><th style="width:110px">热度</th><th style="width:140px">创建时间</th><th style="width:140px">操作</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="pager">
+      <button id="newsPrev" class="btn">← 上一页</button>
+      <span id="newsPage"></span>
+      <button id="newsNext" class="btn">下一页 →</button>
+    </div>
+  </section>
+
+  <!-- ============ Spider ============ -->
+  <section id="tab-spider" class="panel">
+    <div class="toolbar">
+      <button id="spiderRun" class="btn primary">▶ 运行爬虫 (new)</button>
+      <span id="spiderMsg" class="muted"></span>
+    </div>
+    <div class="grid-2">
+      <div class="box">
+        <h3>任务列表</h3>
+        <table class="tbl" id="jobsTbl">
+          <thead><tr><th>ID</th><th>状态</th><th>开始</th><th>耗时</th><th>条数</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="box">
+        <h3>日志 <span class="muted" id="logJobId"></span></h3>
+        <pre id="jobLog" class="log">选择左侧任务查看日志</pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>

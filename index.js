@@ -1,44 +1,42 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const mysql = require('mysql2/promise')
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'lcbird',
-  password: '1140',
-  database: 'newsdb'
-})
+'use strict'
+const config = require('./src/config')
+const { buildApp } = require('./src/app')
+const { pool, ping } = require('./src/db')
+const spider = require('./src/services/spiderService')
 
-app.use(cors())
-app.use(express.json())
+async function main() {
+  const app = buildApp()
 
-
-app.get('/', (request, response) => {
-  response.send('<h1>its my version 0.1 i am link by mysql</h1>')
-  console.log('connect to /')
-})
-
-//app.get from mysql
-app.get('/api/news', async (request, response) => {
-    const [rows] = await pool.query('SELECT * FROM news')
-    response.json(rows)
-    console.log('connect to /api/news')
-})
-
-//app.get from mysql by id
-app.get('/api/news/:id', async (request, response) => {
-  const id = Number(request.params.id)
-  const [rows] = await pool.query('SELECT * FROM news WHERE id = ?', [id])
-  if (rows.length > 0) {
-    response.json(rows[0])
-  } else {
-    response.status(404).json({ error: 'news not found' })
+  try {
+    await ping()
+    console.log(`[db] connected ${config.db.host}:${config.db.port}/${config.db.database}`)
+  } catch (err) {
+    console.error(`[db] ping failed: ${err.message} (server still starts; /api/health reports degraded)`)
   }
-  console.log('connect to /api/news:id')
-})
 
-const PORT = process.env.PORT||3001
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  const server = app.listen(config.port, () => {
+    console.log(`[server] news-server listening on http://localhost:${config.port}`)
+    console.log(`[server] console: http://localhost:${config.port}/console/`)
+    if (config.adminTokenEphemeral) {
+      console.log('[auth] ADMIN_TOKEN not set; ephemeral token for this boot:')
+      console.log(`[auth]   ${config.adminToken}`)
+    }
+  })
 
+  const shutdown = (signal) => {
+    console.log(`\n[server] ${signal} received, shutting down...`)
+    spider.killAll()
+    server.close(async () => {
+      try { await pool.end() } catch { /* noop */ }
+      process.exit(0)
+    })
+    setTimeout(() => process.exit(1), 5000).unref()
+  }
+  process.on('SIGINT', () => shutdown('SIGINT'))
+  process.on('SIGTERM', () => shutdown('SIGTERM'))
+}
+
+main().catch((err) => {
+  console.error('[server] fatal:', err)
+  process.exit(1)
+})
