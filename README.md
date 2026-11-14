@@ -44,3 +44,7 @@ MongoDB pipeline 已改为可选容错（Atlas 不可达时自动跳过，不影
 
 - `mongo.js` —— 早期学习用的 MongoDB 连接测试脚本，与运行时无关，保留存档。
 - `news/`（兄弟目录）—— Scrapy 项目，`SCRAPY_DIR` 默认指向 `../news`。
+
+## 贡献者
+
+- [@wanfeng785](https://github.com/wanfeng785)
